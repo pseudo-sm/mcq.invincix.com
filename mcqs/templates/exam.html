@@ -61,6 +61,11 @@
                         <h3 class="text-danger">Q.</h3>
                         <h5 class="mt-1 ml-2">{{question.question}}</h5>
                      </div>
+                     {% if question.image %}
+                     <div class="d-flex flex-row align-items-center question-title">
+                        <img src="/media/{{question.image}}"  class="m-5 img-fluid">
+                     </div>
+                     {% endif %}
                      <input type="hidden" name="question_id" value="{{question.question_id}}">
                      {% for option in question.options %}
                      <div class="ans ml-2">

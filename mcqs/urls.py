@@ -26,3 +26,8 @@ urlpatterns = [
     path('resume-exam-action',views.resume_exam_action,name="resume_exam_action"),
     path('',views.index,name="index")
 ]
+
+
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns += static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)

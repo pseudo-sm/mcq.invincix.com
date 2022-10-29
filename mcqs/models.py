@@ -7,7 +7,7 @@ class Question(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.TextField()
     category = models.CharField(max_length=255)
-
+    image = models.ImageField(upload_to="questions/",null=True,blank=True)
 
     def __str__(self):
         return self.question

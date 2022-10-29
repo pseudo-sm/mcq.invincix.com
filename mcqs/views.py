@@ -71,17 +71,18 @@ def index(request):
 def fetch_next(candidate_id):
     total_questions = len(Question.objects.all())
     with connection.cursor() as cursor:
-        cursor.execute("select id,question from question q where id not in (select question_id_id from submission s where s.candidate_id_id={})".format(candidate_id))
+        cursor.execute("select id,question,image from question q where id not in (select question_id_id from submission s where s.candidate_id_id={})".format(candidate_id))
         row = cursor.fetchall()
         if len(row)==0:
             connection.close()
             return 
         qno = total_questions-len(row)+1
-        question_id, question = choice(row)
+        question_id, question,image = choice(row)
+        print(question_id,image)
         cursor.execute("select id,option_value from option where question_id={}".format(question_id))
         options = cursor.fetchall()
     connection.close()
-    return {'question_id':question_id,"question":question,"options":options,'qno':qno,'total_questions':total_questions}
+    return {'question_id':question_id,"question":question,"options":options,'qno':qno,'total_questions':total_questions,'image':image}
         
 def get_object(pk_id,obj_type):
 
