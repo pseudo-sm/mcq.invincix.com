@@ -18,11 +18,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('question/<slug:id>',views.question,name='question'),
+    path('question/<slug:qno>',views.get_question,name='get_question'),
     path('start',views.start,name="start"),
     path('next',views.next,name="next"),
     path('done',views.done,name="done"),
     path('resume-exam',views.resume_exam,name="resume_exam"),
+    path('results',views.results,name="results"),
     path('resume-exam-action',views.resume_exam_action,name="resume_exam_action"),
     path('',views.index,name="index")
 ]

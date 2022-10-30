@@ -1,20 +1,21 @@
 from django.shortcuts import render,redirect
+from django.http.response import JsonResponse
 from django.db import connection
 from random import choice
-from . models import Candidate,Submission,Question,Option
+from . models import Candidate,Submission,Question,Option,Answer
 from django.db.utils import IntegrityError
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 def done(request):
-    
-    return render(request,"done.html")
+    response = render(request,"done.html")
+    response.set_cookie('registration_no',None,max_age=7200)
+    return response
 
-def question(request,id):
-    question = fetch_next(id)
-    if question is None:
-        return redirect('done')
-    return render(request,"exam.html",{"question":question})
+def resume_exam(request):
+
+    return render(request,"resume-exam.html")
 
 
 def resume_exam_action(request):
@@ -22,28 +23,29 @@ def resume_exam_action(request):
     registered_registration_no = request.COOKIES.get("registration_no")
     if trial_registration_no == registered_registration_no:
         candidate = Candidate.objects.get(registration_no=trial_registration_no)
-        return redirect('question/{}'.format(candidate.candidate_id))
+        return redirect('question/1'.format(candidate.candidate_id))
     else:
         messages.error(request, 'You can resume your exam only in your original exam machine')
         return redirect('resume_exam')
 
-def resume_exam(request):
-
-    return render(request,'resume-exam.html')
-
-
 def next(request):
-
     question_id = request.POST.get("question_id")
     choice_id = request.POST.get("choice_id")
-    candidate_id = request.session.get("candidate_id")
-    print(candidate_id)
-    candidate=get_object(candidate_id,'Candidate')
+    registration_no = request.COOKIES.get("registration_no")
+    if registration_no is None:
+        messages.error(request, 'Something went wrong.')
+        return redirect('index')
+    candidate = Candidate.objects.get(registration_no=registration_no)
     question=get_object(question_id,'Question')
     choice=get_object(choice_id,'Option')
-    new_submission = Submission(candidate_id=candidate,question_id=question,choice_id=choice)
-    new_submission.save()
-    return redirect('question/{}'.format(candidate_id))
+    submission = Submission.objects.get(question_id=question,candidate_id=candidate)
+    if choice is not None:
+        submission.choice_id = choice
+        submission.save()
+    max_qno = Submission.objects.filter(candidate_id=candidate.candidate_id).order_by("-qno")[0].qno
+    if int(submission.qno)==int(max_qno):
+        return redirect('question/1')
+    return redirect('question/{}'.format(submission.qno+1))
 
 def start(request):
 
@@ -60,8 +62,13 @@ def start(request):
     except IntegrityError:
         messages.error(request, 'Candidate already registered')
         return redirect('index')
-    response = redirect('question/{}'.format(new_candidate.candidate_id))
-    response.set_cookie('registration_no',registration_no,max_age=3600)
+    qno = 1
+    for question in Question.objects.order_by('?'):
+        default_submission = Submission(candidate_id=new_candidate,question_id=question,qno=qno)
+        default_submission.save()
+        qno+=1
+    response = redirect('question/1')
+    response.set_cookie('registration_no',registration_no,max_age=7200)
     return response
 
 def index(request):
@@ -69,29 +76,68 @@ def index(request):
     return render(request,"index.html")
 
 def fetch_next(candidate_id):
-    total_questions = len(Question.objects.all())
-    with connection.cursor() as cursor:
-        cursor.execute("select id,question,image from question q where id not in (select question_id_id from submission s where s.candidate_id_id={})".format(candidate_id))
-        row = cursor.fetchall()
-        if len(row)==0:
-            connection.close()
-            return 
-        qno = total_questions-len(row)+1
-        question_id, question,image = choice(row)
-        print(question_id,image)
-        cursor.execute("select id,option_value from option where question_id={}".format(question_id))
-        options = cursor.fetchall()
-    connection.close()
+    
     return {'question_id':question_id,"question":question,"options":options,'qno':qno,'total_questions':total_questions,'image':image}
-        
-def get_object(pk_id,obj_type):
 
-    if obj_type=='Candidate':
-        object = Candidate.objects.get(candidate_id=pk_id) 
-    elif obj_type=='Question':
-        object = Question.objects.get(id=pk_id)
-    elif obj_type=='Option':
-        object = Option.objects.get(id=pk_id)
-    else:
-        return "Invalid Object"
-    return object
+def get_object(pk_id,obj_type):
+    try:
+        if obj_type=='Candidate':
+            object = Candidate.objects.get(candidate_id=pk_id)
+        elif obj_type=='Question':
+            object = Question.objects.get(id=pk_id)
+        elif obj_type=='Option':
+            object = Option.objects.get(id=pk_id)
+        else:
+            return "Invalid Object"
+        return object
+    except ObjectDoesNotExist:
+        None
+
+def results(request):
+    candidates = Candidate.objects.all()
+    questions = Question.objects.all()
+    submissions = Submission.objects.all()
+    answers = Answer.objects.all()
+    results = []
+    correct_aptitude = 0
+    correct_program = 0
+    for candidate in candidates:
+        for question in questions:
+            try:
+                unit_submission = submissions.get(question_id=question,candidate_id=candidate)
+                correct_choice = answers.get(question_id=unit_submission.question_id).correct_choice
+                if unit_submission.choice_id == correct_choice:
+                    if question.category=='Program':
+                        correct_program+=1
+                    else:
+                        correct_aptitude+=1
+            except ObjectDoesNotExist:
+                pass
+        apti_total = questions.filter(category='Aptitude').count()
+        program_total = questions.filter(category='Program').count()
+        correct_program = round(correct_program*100/program_total,2)
+        correct_aptitude = round(correct_aptitude*100/apti_total,2)
+        results.append({"registration_no":candidate.registration_no,"name":candidate.name,"phone":candidate.phone,"program":correct_program,"aptitude":correct_aptitude})
+
+    return render(request,"results.html",{"results":results})
+
+
+def get_question(request,qno):
+    registration_no = request.COOKIES.get("registration_no")
+    if registration_no == "None":
+        messages.error(request, 'Something went wrong.')
+        return redirect('index')
+    candidate = Candidate.objects.get(registration_no=registration_no)
+    result_question = {}
+    with connection.cursor() as cursor:
+        cursor.execute("select q.id,question,image from question q join submission s on (s.question_id_id = q.id and s.qno={} and s.candidate_id_id={})".format(qno,candidate.candidate_id))
+        result_question["question_id"],result_question["question"],result_question["image"] = cursor.fetchall()[0]
+        cursor.execute("select id,option_value from option where question_id={}".format(result_question["question_id"]))
+        result_question["options"] = cursor.fetchall()
+    connection.close()
+    submissions = list(Submission.objects.filter(candidate_id=candidate.candidate_id).values("question_id","choice_id","qno"))
+    finish = False
+    max_qno = Submission.objects.filter(candidate_id=candidate.candidate_id).order_by("-qno")[0].qno
+    if int(qno)==int(max_qno):
+        finish = True
+    return render(request,"exam.html",{"question":result_question,"submissions":submissions,"finish":finish})

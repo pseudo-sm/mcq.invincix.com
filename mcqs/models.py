@@ -33,10 +33,10 @@ class Answer(models.Model):
 
     class Meta:
         db_table = 'answer'
-    
+
     def __str__(self):
         return self.question_id.question
-    
+
 
 class Candidate(models.Model):
 
@@ -55,8 +55,7 @@ class Submission(models.Model):
 
     candidate_id = models.ForeignKey(Candidate,on_delete=models.CASCADE)
     question_id = models.ForeignKey(Question,on_delete=models.CASCADE)
-    choice_id = models.ForeignKey(Option,on_delete=models.CASCADE)
-
+    choice_id = models.ForeignKey(Option,on_delete=models.CASCADE,null=True,blank=True)
+    qno = models.IntegerField()
     class Meta:
         db_table = 'submission'
-    

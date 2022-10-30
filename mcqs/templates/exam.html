@@ -1,6 +1,9 @@
 <html>
    <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
       <style>
          body{
          background-color:#eee;
@@ -16,7 +19,7 @@
          pointer-events: none;
          }
          label.radio span {
-         padding: 4px 0px;
+         padding: 10px 0px;
          border: 1px solid red;
          display: inline-block;
          color: red;
@@ -42,45 +45,173 @@
          outline: 0 !important;
          box-shadow: none !important;
          }
+         .quant_number {
+            text-align: center;
+            border-radius: 11px 2px 2px 2px;
+            padding: 5px 0px;
+        }
+        .quant_number_active {
+           background: #d39e00;
+           color: #fff;
+         }
+         .quant_number_success {
+            background: #28a745;
+            color: #fff;
+          }
+         .quant_number_de-active {
+            background: #e6f0f9;
+            color: #000;
+         }
+         footer{
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+         }
+         .quant_number_de-active_lockicon {
+            font-size: 18px;
+            color: #21252952;
+            padding: 5px 0px;
+            display: block;
+         }
       </style>
    </head>
    <body>
-      <div class="container mt-5">
-         <div class="d-flex justify-content-center row">
-            <div class="col-md-10 col-lg-10">
-               <div class="border">
-                  <div class="question bg-white p-3 border-bottom">
-                     <div class="d-flex flex-row justify-content-between align-items-center mcq">
-                        <h4>MCQ Quiz</h4>
-                        <span>({{question.qno}} of {{question.total_questions}})</span>
-                     </div>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+        
+            <a style="width: 160px;" class="navbar-brand" target="_blank" href="https://www.invincix.com"><img src="/media/questions/Invincix_TM.svg"> </a>
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+       
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav ml-auto">
+             <li class="nav-item "style="
+             font-size: 25px;
+             font-weight: 500;
+             text-transform: uppercase;
+             color: #318bad;
+         ">
+              Campus drive 2022
+             </li>
+            
+           </ul>
+         </div>
+         </div>
+        
+       </nav>
+      <div class="container mt-5" style="
+      margin-bottom: 100px;
+  ">
+         <div class="row">
+            <div class="col-md-8">
+               <div class="d-flex justify-content-center row">
+                  <div class="col-md-12">
+                     <div class="border">
+                        <div class="question bg-white p-3 border-bottom">
+                           <div class="d-flex flex-row justify-content-between align-items-center mcq">
+                              <h4>Campus Drive | Fundamentals</h4>
+                              <span>({{question.qno}} of {{question.total_questions}})</span>
+                           </div>
+                        </div>
+                        <form action="{% url 'next' %}" method="post" class="question bg-white p-3 border-bottom">
+                          {% csrf_token %} 
+                          <div class="d-flex flex-row align-items-center question-title">
+                              <h3 class="text-danger">Q {{question.qno}}. </h3>
+                              <h5 class="mt-1 ml-2">{{question.question}}</h5>
+                           </div>
+                           {% if question.image %} 
+                           <div class=" question-title m-5">
+                              <img src="/media/{{question.image}}"  class=" img-fluid">
+                           </div>
+                           {% endif %}
+                           <input type="hidden" name="question_id" value="{{question.question_id}}">
+                           {% for option in question.options %}
+                           
+                           <div class="ml-5">
+                              <div class="w-100">
+                                 <label class="radio  w-100"> <input type="radio" name="choice_id" value="{{option.0}}"> <span class=" w-100">{{option.1}}</span>
+                                 </label>    
+                              </div>
+                           </div>
+                           {% endfor %}
+                        </div>
+                        <div class="d-flex flex-row justify-content-between align-items-center p-3 bg-white">
+                           <button type="submit" class="btn btn-primary border-success align-items-center btn-success w-100" type="button">Next<i class="fa fa-angle-right ml-2"></i></button>
+                        </div>
+                        {% if finish %}
+                           <div class="d-flex flex-row justify-content-between align-items-center p-3 bg-white">
+                              <a type="button" class="btn btn-primary border-success align-items-center btn-danger w-100" href="{% url 'done' %}" type="button">Finish</a>
+                           </div>
+                        {% endif %}
+                      </form>
                   </div>
-                  <form action="{% url 'next' %}" method="post" class="question bg-white p-3 border-bottom">
-                    {% csrf_token %} 
-                    <div class="d-flex flex-row align-items-center question-title">
-                        <h3 class="text-danger">Q.</h3>
-                        <h5 class="mt-1 ml-2">{{question.question}}</h5>
+               </div>
+            </div>
+            <div class="col-md-4">
+               <div class="right-side-bar">
+                  {% comment %} <div class="card mb-4">
+                     <div class="card-header">Time left</div>
+                     <div class="card-body">
+                        <div class="row">
+                           <div class="col">
+                              <div class="time_box text-center">
+                                 <p>Hours</p>
+                                 <span>00</span>
+                              </div>
+                           </div>
+                           <div class="col">
+                              <div  class="time_box text-center">
+                                 <p>Minutes</p>
+                                 <span>00</span>
+                              </div>
+                           </div>
+                           <div class="col">
+                              <div  class="time_box text-center">
+                                 <p>Seconds</p>
+                                 <span>00</span>
+                              </div>
+                           </div>
+                        </div>
                      </div>
-                     {% if question.image %}
-                     <div class="d-flex flex-row align-items-center question-title">
-                        <img src="/media/{{question.image}}"  class="m-5 img-fluid">
+                  </div> {% endcomment %}
+                  <div class="card mb-4">
+                     <div class="card-header">
+                       Questions
                      </div>
-                     {% endif %}
-                     <input type="hidden" name="question_id" value="{{question.question_id}}">
-                     {% for option in question.options %}
-                     <div class="ans ml-2">
-                        <label class="radio"> <input type="radio" name="choice_id" value="{{option.0}}"> <span>{{option.1}}</span>
-                        </label>    
+                     <div class="card-body">
+                       <div class="row">
+                        {% for question in submissions %}
+                         <div class="col-sm-2 pl-1 pr-1">
+                           <a href="{% url 'get_question' qno=question.qno  %}"><h4 class="quant_number {% if question.choice_id %} quant_number_success {% else %} quant_number_active {% endif %}" >{{ question.qno }}</h4></a>
+                         </div>
+                         <script>
+                              $("input[name='choice_id'][value={{question.choice_id}}]").prop("checked",true);
+                           </script>
+                         {% endfor %}
+                         {% for lock in locks %}
+                         <div class="col-sm-2 pl-1 pr-1">
+                           <h4 class="quant_number quant_number_de-active">
+                              <span class="quant_number_de-active_lockicon"><i class="fas fa-lock"></i></span>
+                           </h4>
+                         </div>
+                         {% endfor %}
+                       <div>
                      </div>
-                     {% endfor %}
-                  </div>
-                  <div class="d-flex flex-row justify-content-between align-items-center p-3 bg-white">
-                     <button type="submit" class="btn btn-primary border-success align-items-center btn-success w-100" type="button">Next<i class="fa fa-angle-right ml-2"></i></button>
-                  </div>
-                </form>
+                   </div>
+               </div>
             </div>
          </div>
+         
       </div>
+   </div>
+         
+</div>
+      <footer class="footer mt-5 py-3 bg-light">
+         <div class="container text-center">
+            <a class="text-muted"  target="_blank" href="https://www.invincix.com">www.invincix.com</a>
+         </div>
+      </footer>
    </body>
    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
