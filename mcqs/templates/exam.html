@@ -86,7 +86,7 @@
        
          <div class="collapse navbar-collapse" id="navbarSupportedContent">
            <ul class="navbar-nav ml-auto">
-             <li class="nav-item "style="
+             <li class="nav-item" style="
              font-size: 25px;
              font-weight: 500;
              text-transform: uppercase;
@@ -150,31 +150,31 @@
             </div>
             <div class="col-md-4">
                <div class="right-side-bar">
-                  {% comment %} <div class="card mb-4">
+                  <div class="card mb-4">
                      <div class="card-header">Time left</div>
                      <div class="card-body">
                         <div class="row">
                            <div class="col">
                               <div class="time_box text-center">
                                  <p>Hours</p>
-                                 <span>00</span>
+                                 <span id="hours"></span>
                               </div>
                            </div>
                            <div class="col">
                               <div  class="time_box text-center">
                                  <p>Minutes</p>
-                                 <span>00</span>
+                                 <span id="minutes"></span>
                               </div>
                            </div>
                            <div class="col">
                               <div  class="time_box text-center">
                                  <p>Seconds</p>
-                                 <span>00</span>
+                                 <span id="seconds"></span>
                               </div>
                            </div>
                         </div>
                      </div>
-                  </div> {% endcomment %}
+                  </div> 
                   <div class="card mb-4">
                      <div class="card-header">
                        Questions
@@ -207,6 +207,70 @@
    </div>
          
 </div>
+<script>
+let socket;
+let intervalId;
+function connect() {
+   socket = new WebSocket('ws://' + window.location.host + '/timer/');
+   intervalId = setInterval(function() {
+  // Code to be executed every second
+      if(socket.readyState<=1){
+         socket.send('{{registration_no}}');
+      }
+      else {
+         clearInterval(intervalId);
+      }
+}, 1000);
+
+  socket.onopen = function() {
+    console.log('WebSocket connection established');
+    // Add your logic for handling the connection
+  };
+
+  socket.onmessage = function(event) {
+  let data = JSON.parse(event.data)
+  let hours = data.hours.toString().padStart(2, '0');
+  let minutes = data.minutes.toString().padStart(2, '0');
+  let seconds = data.seconds.toString().padStart(2, '0');
+  $('#hours').text(hours);
+  $('#minutes').text(minutes);
+  $('#seconds').text(seconds);
+};
+
+  socket.onclose = function(event) {
+    console.log('WebSocket connection closed');
+    // Reconnect after a delay
+    setTimeout(connect, 2000); // Adjust the delay as per your requirements
+  };
+}
+window.onload = function() {
+connect();
+// Add event listener to visibility change event
+document.addEventListener('visibilitychange', handleVisibilityChange);
+
+// Function to handle visibility change event
+function handleVisibilityChange() {
+  // Perform actions when visibility changes
+  // ...
+   alert('You are not allowed to switch tabs in the middle of the exam');
+  // Remove the event listener to prevent further handling
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+}
+
+// Add event listener to beforeunload event
+   window.addEventListener('beforeunload', function() {
+   // Remove the event listener to prevent further handling
+   document.removeEventListener('visibilitychange', handleVisibilityChange);
+   });
+}
+document.addEventListener('copy', function(event) {
+  // Prevent the default copy behavior
+  event.preventDefault();
+
+});
+
+</script>
+
       <footer class="footer mt-5 py-3 bg-light">
          <div class="container text-center">
             <a class="text-muted"  target="_blank" href="https://www.invincix.com">www.invincix.com</a>

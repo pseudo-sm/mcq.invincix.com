@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import timedelta
 # Create your models here.
 
 class Question(models.Model):
@@ -44,6 +44,7 @@ class Candidate(models.Model):
     name = models.CharField(max_length=255,null=False,blank=False)
     registration_no = models.CharField(max_length=255,unique=True,null=False,blank=False)
     phone = models.CharField(max_length=100)
+    time = models.DurationField(default=timedelta(minutes=150))
 
     def __str__(self):
         return self.name + '({})'.format(self.candidate_id)
@@ -59,3 +60,13 @@ class Submission(models.Model):
     qno = models.IntegerField()
     class Meta:
         db_table = 'submission'
+
+class PassKey(models.Model):
+
+    passcode = models.CharField(max_length=100)
+    validity_start = models.DateTimeField()
+    validity_end = models.DateTimeField()
+    is_valid = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.passcode

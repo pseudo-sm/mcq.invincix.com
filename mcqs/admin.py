@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import Question,Option,Answer,Candidate,Submission
+from .models import Question,Option,Answer,Candidate,Submission,PassKey
 from django import forms
+from django.contrib.auth.models import Group, User
+
 # Register your models here.
 
 class OptionInline(admin.StackedInline):
@@ -28,7 +30,11 @@ class AnswerAdmin(admin.ModelAdmin):
     form=AnswerForm
     
 
+admin.site.unregister(User)
+admin.site.unregister(Group)
+
 admin.site.register(Question,QuestionAdmin)
 admin.site.register(Candidate)
+admin.site.register(PassKey)
 admin.site.register(Submission)
 admin.site.register(Answer,AnswerAdmin)

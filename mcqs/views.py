@@ -2,10 +2,12 @@ from django.shortcuts import render,redirect
 from django.http.response import JsonResponse
 from django.db import connection
 from random import choice
-from . models import Candidate,Submission,Question,Option,Answer
+from . models import Candidate,Submission,Question,Option,Answer,PassKey
 from django.db.utils import IntegrityError
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import timedelta,datetime
+from django.db import connection
 # Create your views here.
 
 def done(request):
@@ -52,6 +54,12 @@ def start(request):
     name = request.POST.get("name")
     registration_no = request.POST.get("regno")
     phone = request.POST.get("mobileno")
+    passkey = request.POST.get("passkey")
+    valid_passkeys = list(PassKey.objects.filter(validity_start__lte=datetime.now()).filter(validity_end__gte=datetime.now()).values_list("passcode",flat=True))
+    print(valid_passkeys)
+    if passkey not in valid_passkeys:
+        messages.error(request,'Invalid passkey')
+        return redirect('index')
     if "" in [name,registration_no,phone]:
         messages.error(request, 'All fields are mandatory.')
         return redirect('index')
@@ -94,6 +102,25 @@ def get_object(pk_id,obj_type):
         None
 
 def results(request):
+    with connection.cursor() as cursor:
+        cursor.execute('''            
+            select cand.name candidate_name, count(1) correct from submission sub
+            join
+            candidate cand on (sub.candidate_id_id = cand.candidate_id)
+            join answer a on(a.question_id_id = sub.question_id_id and a.correct_choice_id = sub.choice_id_id)
+            group by cand.name
+            order by count(1) desc;
+        ''')
+        results = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        results = [
+            dict(zip(columns, row))
+            for row in results
+        ]
+        max_qno = Question.objects.count()
+    return render(request,"results.html",{'results':results,'max_qno':max_qno})
+
+def results1(request):
     candidates = Candidate.objects.all()
     questions = Question.objects.all()
     submissions = Submission.objects.all()
@@ -124,7 +151,7 @@ def results(request):
 
 def get_question(request,qno):
     registration_no = request.COOKIES.get("registration_no")
-    if registration_no == "None":
+    if registration_no is None:
         messages.error(request, 'Something went wrong.')
         return redirect('index')
     candidate = Candidate.objects.get(registration_no=registration_no)
@@ -140,4 +167,8 @@ def get_question(request,qno):
     max_qno = Submission.objects.filter(candidate_id=candidate.candidate_id).order_by("-qno")[0].qno
     if int(qno)==int(max_qno):
         finish = True
-    return render(request,"exam.html",{"question":result_question,"submissions":submissions,"finish":finish})
+    if(candidate.time<timedelta(minutes=150)):
+        started = 1
+    else:
+        started = 0
+    return render(request,"exam.html",{"question":result_question,"submissions":submissions,"finish":finish,"registration_no":registration_no,"started":started,"qno":qno,"max_qno":max_qno})

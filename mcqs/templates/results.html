@@ -1,45 +1,36 @@
-
 <html>
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <style>
-            .vertical-center {
-                min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
-                min-height: 100vh; /* These two lines are counted as one :-)       */
-                display: flex;
-                align-items: center;
-              }
-        </style>
-    </head>
-    <body>
-    <div class="vertical-center">
-        <div class="container">
-                <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Registration Number</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Phone</th>
-                    <th scope="col">Aptitude</th>
-                    <th scope="col">Program</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for row in results %}
-                    <tr>
-                        <th scope="row">{{forloop.counter}}</th>
-                        <td>{{row.registration_no}}</td>
-                        <td>{{row.name}}</td>
-                        <td>{{row.phone}}</td>
-                        <td>{{row.aptitude}}</td>
-                        <td>{{row.program}}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+   <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>{{forloop.counter}}</td>
+          <td>{{row.candidate_name}}</td>
+          <td>{{row.correct}}/{{max_qno}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="footer mt-5 py-3 bg-light">
+    <div class="container text-center">
+       <a class="text-muted"  target="_blank" href="https://www.invincix.com">www.invincix.com</a>
     </div>
+ </footer>
 </body>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
