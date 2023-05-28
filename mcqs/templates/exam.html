@@ -211,7 +211,8 @@
 let socket;
 let intervalId;
 function connect() {
-   socket = new WebSocket('ws://' + window.location.host + '/timer/');
+   var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+   socket = new WebSocket(ws_scheme+'://' + window.location.host + '/timer/');
    intervalId = setInterval(function() {
   // Code to be executed every second
       if(socket.readyState<=1){
@@ -252,7 +253,7 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
   // Perform actions when visibility changes
   // ...
-   alert('You are not allowed to switch tabs in the middle of the exam');
+   window.location = window.location.origin+'/done';
   // Remove the event listener to prevent further handling
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
