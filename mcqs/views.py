@@ -104,7 +104,7 @@ def get_object(pk_id,obj_type):
 def results(request):
     with connection.cursor() as cursor:
         cursor.execute('''            
-            select cand.name candidate_name, count(1) correct from submission sub
+            select cand.name candidate_name,cand.phone,cand.registration_no,cand.time, count(1) correct from submission sub
             join
             candidate cand on (sub.candidate_id_id = cand.candidate_id)
             join answer a on(a.question_id_id = sub.question_id_id and a.correct_choice_id = sub.choice_id_id)

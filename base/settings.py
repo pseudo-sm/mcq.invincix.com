@@ -147,3 +147,9 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://3f77-2405-201-a005-d0e4-20af-cf52-7a4e-18d3.ngrok-free.app',
+    # Other trusted origins...
+]

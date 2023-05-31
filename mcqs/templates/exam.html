@@ -20,9 +20,9 @@
          }
          label.radio span {
          padding: 10px 0px;
-         border: 1px solid red;
+         border: 1px solid #00c16e;
          display: inline-block;
-         color: red;
+         color: #00c16e;
          width: 100px;
          text-align: center;
          border-radius: 3px;
@@ -30,8 +30,8 @@
          text-transform: uppercase;
          }
          label.radio input:checked + span {
-         border-color: red;
-         background-color: red;
+         border-color: #00c16e;
+         background-color: #00c16e;
          color: #fff;
          }
          .ans {
@@ -51,7 +51,7 @@
             padding: 5px 0px;
         }
         .quant_number_active {
-           background: #d39e00;
+           background: #ffc845;
            color: #fff;
          }
          .quant_number_success {
@@ -73,12 +73,16 @@
             padding: 5px 0px;
             display: block;
          }
+         .text-danger {
+            color: #00c16e!important
+         }
       </style>
    </head>
    <body>
+      
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-        
+        {% comment %}
             <a style="width: 160px;" class="navbar-brand" target="_blank" href="https://www.invincix.com"><img src="/media/questions/Invincix_TM.svg"> </a>
          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
            <span class="navbar-toggler-icon"></span>
@@ -100,6 +104,7 @@
          </div>
         
        </nav>
+       {% endcomment %}
       <div class="container mt-5" style="
       margin-bottom: 100px;
   ">
@@ -110,14 +115,14 @@
                      <div class="border">
                         <div class="question bg-white p-3 border-bottom">
                            <div class="d-flex flex-row justify-content-between align-items-center mcq">
-                              <h4>Campus Drive | Fundamentals</h4>
-                              <span>({{question.qno}} of {{question.total_questions}})</span>
+                              <h4>Heading for the Future | Filtration Test</h4>
+                              <span>({{qno}} of {{max_qno}})</span>
                            </div>
                         </div>
                         <form action="{% url 'next' %}" method="post" class="question bg-white p-3 border-bottom">
                           {% csrf_token %} 
                           <div class="d-flex flex-row align-items-center question-title">
-                              <h3 class="text-danger">Q {{question.qno}}. </h3>
+                              <h4 class="text-danger">Q {{qno}}. </h4>
                               <h5 class="mt-1 ml-2">{{question.question}}</h5>
                            </div>
                            {% if question.image %} 
@@ -253,7 +258,7 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
   // Perform actions when visibility changes
   // ...
-   window.location = window.location.origin+'/done';
+      //window.location = window.location.origin+'/done';
   // Remove the event listener to prevent further handling
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
@@ -271,12 +276,13 @@ document.addEventListener('copy', function(event) {
 });
 
 </script>
-
+      {% comment %}
       <footer class="footer mt-5 py-3 bg-light">
          <div class="container text-center">
             <a class="text-muted"  target="_blank" href="https://www.invincix.com">www.invincix.com</a>
          </div>
       </footer>
+      {% endcomment %}
    </body>
    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
