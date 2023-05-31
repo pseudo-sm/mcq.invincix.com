@@ -153,3 +153,5 @@ CSRF_TRUSTED_ORIGINS = [
     'https://h4tf.invincix.com',
     # Other trusted origins...
 ]
+
+LOGIN_URL = 'admin:login'

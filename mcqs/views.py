@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import timedelta,datetime
 from django.db import connection
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
 def done(request):
@@ -56,7 +58,6 @@ def start(request):
     phone = request.POST.get("mobileno")
     passkey = request.POST.get("passkey")
     valid_passkeys = list(PassKey.objects.filter(validity_start__lte=datetime.now()).filter(validity_end__gte=datetime.now()).values_list("passcode",flat=True))
-    print(valid_passkeys)
     if passkey not in valid_passkeys:
         messages.error(request,'Invalid passkey')
         return redirect('index')
@@ -101,6 +102,7 @@ def get_object(pk_id,obj_type):
     except ObjectDoesNotExist:
         None
 
+@login_required
 def results(request):
     with connection.cursor() as cursor:
         cursor.execute('''            

@@ -7,6 +7,8 @@
       <style>
          body{
          background-color:#eee;
+         font-family: 'Lato';
+         font-weight: 400;
          }
          label.radio {
          cursor: pointer;
@@ -241,6 +243,10 @@ function connect() {
   $('#hours').text(hours);
   $('#minutes').text(minutes);
   $('#seconds').text(seconds);
+  localStorage.setItem('hours', hours);
+  localStorage.setItem('minutes', minutes);
+  localStorage.setItem('seconds', seconds);
+
 };
 
   socket.onclose = function(event) {
@@ -250,6 +256,13 @@ function connect() {
   };
 }
 window.onload = function() {
+  let hours = localStorage.getItem('hours');
+  let minutes = localStorage.getItem('minutes');
+  let seconds = localStorage.getItem('seconds');
+   $('#hours').text(hours);
+  $('#minutes').text(minutes);
+  $('#seconds').text(seconds);
+  
 connect();
 // Add event listener to visibility change event
 document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -258,7 +271,7 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
   // Perform actions when visibility changes
   // ...
-      //window.location = window.location.origin+'/done';
+      window.location = window.location.origin+'/done';
   // Remove the event listener to prevent further handling
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
