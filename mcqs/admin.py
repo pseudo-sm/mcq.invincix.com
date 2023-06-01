@@ -34,7 +34,7 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 
 admin.site.register(Question,QuestionAdmin)
-#admin.site.register(Candidate)
+admin.site.register(Candidate)
 admin.site.register(PassKey)
 #admin.site.register(Submission)
 admin.site.register(Answer,AnswerAdmin)

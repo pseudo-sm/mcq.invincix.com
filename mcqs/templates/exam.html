@@ -247,13 +247,16 @@ function connect() {
   localStorage.setItem('hours', hours);
   localStorage.setItem('minutes', minutes);
   localStorage.setItem('seconds', seconds);
-
+  console.log(hours,minutes,seconds);
+   if(hours=="00" && minutes=="00" && seconds=="00"){
+       window.location = window.location.origin+'/done';
+   }
 };
 
   socket.onclose = function(event) {
     console.log('WebSocket connection closed');
     // Reconnect after a delay
-    setTimeout(connect, 2000); // Adjust the delay as per your requirements
+    setTimeout(connect, 1000); // Adjust the delay as per your requirements
   };
 }
 window.onload = function() {

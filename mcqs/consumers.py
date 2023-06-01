@@ -17,8 +17,9 @@ class TimerConsumer(AsyncWebsocketConsumer):
     @sync_to_async
     def candidate_deduct(self,registration_no):
         candidate = Candidate.objects.get(registration_no=registration_no)
-        candidate.time = candidate.time-timedelta(seconds=1)
-        candidate.save()
+        if(candidate.time.seconds!=0):
+            candidate.time = candidate.time-timedelta(seconds=1)
+            candidate.save()
         return candidate
     
     async def receive(self,text_data):
