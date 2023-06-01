@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import timedelta,datetime
 from django.db import connection
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
 
@@ -21,7 +23,7 @@ def resume_exam(request):
 
     return render(request,"resume-exam.html")
 
-
+@csrf_exempt
 def resume_exam_action(request):
     trial_registration_no = request.POST.get('regno')
     registered_registration_no = request.COOKIES.get("registration_no")
@@ -32,6 +34,7 @@ def resume_exam_action(request):
         messages.error(request, 'You can resume your exam only in your original exam machine')
         return redirect('resume_exam')
 
+@csrf_exempt
 def next(request):
     question_id = request.POST.get("question_id")
     choice_id = request.POST.get("choice_id")
@@ -51,6 +54,7 @@ def next(request):
         return redirect('question/1')
     return redirect('question/{}'.format(submission.qno+1))
 
+@csrf_exempt
 def start(request):
 
     name = request.POST.get("name")
@@ -153,7 +157,8 @@ def results1(request):
 
 def get_question(request,qno):
     registration_no = request.COOKIES.get("registration_no")
-    if registration_no is None:
+    url = request.build_absolute_uri('/')[:-1]
+    if registration_no == 'None':
         messages.error(request, 'Something went wrong.')
         return redirect('index')
     candidate = Candidate.objects.get(registration_no=registration_no)
@@ -173,4 +178,4 @@ def get_question(request,qno):
         started = 1
     else:
         started = 0
-    return render(request,"exam.html",{"question":result_question,"submissions":submissions,"finish":finish,"registration_no":registration_no,"started":started,"qno":qno,"max_qno":max_qno})
+    return render(request,"exam.html",{"question":result_question,"submissions":submissions,"finish":finish,"registration_no":registration_no,"started":started,"qno":qno,"max_qno":max_qno,"url":url})

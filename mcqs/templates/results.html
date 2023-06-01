@@ -15,7 +15,7 @@
           <th>Representative Name</th>
           <th>Team No.</th>
           <th>Team Code</th>
-          <th>Score</th>
+          <th>Score (Out of {{max_qno}})</th>
           <th>Finished in</th>
         </tr>
       </thead>
@@ -26,7 +26,7 @@
           <td>{{row.candidate_name}}</td>
           <td>{{row.phone}}</td>
           <td>{{row.registration_no}}</td>
-          <td>{{row.correct}}/{{max_qno}}</td>
+          <td>{{row.correct}}</td>
           <td>{{ row.time|in_mins }}</td>
         </tr>
         {% endfor %}

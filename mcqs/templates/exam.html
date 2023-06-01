@@ -129,7 +129,7 @@
                            </div>
                            {% if question.image %} 
                            <div class=" question-title m-5">
-                              <img src="/media/{{question.image}}"  class=" img-fluid">
+                              <img src="{{url}}/media/{{question.image}}"  class=" img-fluid">
                            </div>
                            {% endif %}
                            <input type="hidden" name="question_id" value="{{question.question_id}}">
@@ -271,7 +271,7 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
   // Perform actions when visibility changes
   // ...
-      window.location = window.location.origin+'/done';
+      //window.location = window.location.origin+'/done';
   // Remove the event listener to prevent further handling
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
