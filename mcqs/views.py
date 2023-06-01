@@ -85,8 +85,8 @@ def start(request):
     return response
 
 def index(request):
-
-    return render(request,"index.html")
+    url = request.build_absolute_uri('/')[:-1]
+    return render(request,"index.html",{"url":url})
 
 def fetch_next(candidate_id):
     
