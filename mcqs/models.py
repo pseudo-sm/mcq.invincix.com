@@ -22,6 +22,10 @@ class Option(models.Model):
 
     def __str__(self):
         return self.option_value
+    
+    def save(self):
+        self.option_value = self.option_value.capitalize()
+        super().save()
 
     class Meta:
         db_table = 'option'
@@ -44,7 +48,7 @@ class Candidate(models.Model):
     name = models.CharField(max_length=255,null=False,blank=False)
     registration_no = models.CharField(max_length=255,unique=True,null=False,blank=False)
     phone = models.CharField(max_length=100)
-    time = models.DurationField(default=timedelta(minutes=40))
+    time = models.DurationField(default=timedelta(minutes=60))
 
     def __str__(self):
         return self.name + '({})'.format(self.candidate_id)
