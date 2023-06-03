@@ -24,7 +24,7 @@ class Option(models.Model):
         return self.option_value
     
     def save(self):
-        self.option_value = self.option_value.capitalize()
+        self.option_value = self.option_value.title()
         super().save()
 
     class Meta:
